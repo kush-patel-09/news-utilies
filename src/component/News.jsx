@@ -1,21 +1,14 @@
 import React, { Component } from 'react'
 import Header from './Header'
 import Newsitem from './Newsitem'
+import allnews from'./../Simplenews.json';
 
 export default class News extends Component {
     constructor(){
         super();
-
-        // create state
-        this.state={
-            counter:1
+        this.state={ 
+            allArtical: allnews.articles 
         }
-    }
-    demo=()=>{
-        // change state value
-        this.setState({
-            counter:this.state.counter+1
-        });
     }
     render() {
         return (
@@ -24,14 +17,13 @@ export default class News extends Component {
 
                 <div className="container my-5">
                     <div className="row">
-                        {/* access state vlaue */}
-                        <h1>counter:{this.state.counter}</h1>
-                    <button type="button" class="btn btn-primary"onClick={this.demo} >click</button> 
-                       <Newsitem/>
-                       <Newsitem/>
-                       <Newsitem/>
-                       <Newsitem/>
-                       <Newsitem/>
+                        {this.state.allArtical.map((single)=>{
+                            return<Newsitem key={single.url}
+                            title={single. title}
+                            description={single.description}
+                            img={single.urlToImage  }
+                            url={single.url}/>  
+                        })}
                     </div>
                 </div>
             </>
