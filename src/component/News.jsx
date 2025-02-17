@@ -1,14 +1,24 @@
 import React, { Component } from 'react'
 import Header from './Header'
 import Newsitem from './Newsitem'
-import allnews from'./../Simplenews.json';
+
 
 export default class News extends Component {
     constructor(){
         super();
         this.state={ 
-            allArtical: allnews.articles 
+            allArtical:[]
         }
+    }
+    async componentDidMount(){
+        let url= 'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e';
+        let data= await fetch (url);
+        let pareseData= await data.json();
+        // console.log(pareseData);
+
+        this.setState({
+            allArtical:pareseData.articles
+        })
     }
     render() {
         return (
@@ -24,6 +34,8 @@ export default class News extends Component {
                             img={single.urlToImage  }
                             url={single.url}/>  
                         })}
+
+                        
                     </div>
                 </div>
             </>
