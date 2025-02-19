@@ -55,7 +55,7 @@ export default class News extends Component {
     render() {
         return (
             <>
-                <Header  title="Thies is title" desc="Thies is desc"/>
+                <Header  title={this.props.category} desc="Thies is desc"/>
 
                 <div className="container my-5">
 
@@ -67,7 +67,9 @@ export default class News extends Component {
                             title={single. title}
                             description={single.description}
                             img={single.urlToImage  }
-                            url={single.url}/>  
+                            url={single.url}
+                            author={single.author}
+                            publishedAt={single.publishedAt}/>  
                         })}
 
                         <div className="row">
