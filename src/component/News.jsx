@@ -7,44 +7,43 @@ export default class News extends Component {
     constructor(){
         super();
         this.state={ 
+            totalResults:0,
             allArtical:[],
-            pageNo:1
+            pageNo:1,
+            pageSize:5
         }
     }
-    async componentDidMount(){
-        let url= `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e&page=${ this.state.pageNo}`;
+
+    fetchMoreNews= async (no) => {
+        let url= `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e&pagesize=${this.state.pageSize}&page=${ this.state.pageNo}`;
         let data= await fetch (url);
         let pareseData= await data.json();
         // console.log(pareseData);
-
+        
         this.setState({
+            totalResults:pareseData.totalResults,
             allArtical:pareseData.articles
         });
-        
-        
+    }
+
+    async componentDidMount(){
+        this.fetchMoreNews(1);
     }
 
     handleNextClick = async () => {
-        let url= `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e&page=${ this.state.pageNo+1}`;
-        let data= await fetch (url);
-        let pareseData= await data.json();
-        // console.log(pareseData);
+        this.fetchMoreNews(this.state.pageNo+1);
 
         this.setState({
-            allArtical:pareseData.articles,
             pageNo: this.state.pageNo+1
-        })
+        });
     }
+
     handleprevClick = async () => {
-        let url= `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e&page=${ this.state.pageNo-1}`;
-        let data= await fetch (url);
-        let pareseData= await data.json();
-        // console.log(pareseData);
+        this.fetchMoreNews(this.state.pageNo-1);
 
         this.setState({
-            allArtical:pareseData.articles,
-            pageNo: this.state.pageNo-1
-        })
+            pageNo:this.state.pageNo-1
+        });
     }
     
     render() {
@@ -64,8 +63,8 @@ export default class News extends Component {
 
                         <div className="row">
                             <div className="col">
-                                <button className="btn btn-primary float-start" onClick={this.handleprevClick}>Previous</button>
-                                <button className="btn btn-primary float-end"onClick={this.handleNextClick}>Next</button>
+                                <button disabled={this.state.pageNo===1} className="btn btn-primary float-start" onClick={this.handleprevClick}>Previous</button>
+                                <button disabled={this.state.pageNo > (this.state.totalResults / this.state.pageSize)} className="btn btn-primary float-end"onClick={this.handleNextClick}>Next</button>
                             </div>
                         </div>
                     </div>
