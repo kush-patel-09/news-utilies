@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Header from './Header'
 import Newsitem from './Newsitem'
+import Loding from './Loding';
 
 
 export default class News extends Component {
@@ -10,27 +11,31 @@ export default class News extends Component {
             totalResults:0,
             allArtical:[],
             pageNo:1,
-            pageSize:5
+            pageSize:5,
+            loding:false
         }
     }
 
     fetchMoreNews= async (no) => {
-        let url= `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=1c89ee141c4e4c17a238a7218c972b9e&pagesize=${this.state.pageSize}&page=${ this.state.pageNo}`;
+        let url= `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.REACT_APP_API_KEY}&category=${this.props.category}&pagesize=${this.state.pageSize}&page=${ this.state.pageNo}`;
         let data= await fetch (url);
         let pareseData= await data.json();
         // console.log(pareseData);
         
         this.setState({
             totalResults:pareseData.totalResults,
-            allArtical:pareseData.articles
+            allArtical:pareseData.articles,
+            loding:false
         });
     }
 
     async componentDidMount(){
+        this.setState({loding:true});
         this.fetchMoreNews(1);
     }
 
     handleNextClick = async () => {
+        this.setState({loding:true});
         this.fetchMoreNews(this.state.pageNo+1);
 
         this.setState({
@@ -39,6 +44,7 @@ export default class News extends Component {
     }
 
     handleprevClick = async () => {
+        this.setState({loding:true});
         this.fetchMoreNews(this.state.pageNo-1);
 
         this.setState({
@@ -52,8 +58,11 @@ export default class News extends Component {
                 <Header  title="Thies is title" desc="Thies is desc"/>
 
                 <div className="container my-5">
+
+                    { this.state.loding &&<Loding/>}
+
                     <div className="row">
-                        {this.state.allArtical.map((single)=>{
+                        {!this.state.loding && this.state.allArtical.map((single)=>{
                             return<Newsitem key={single.url}
                             title={single. title}
                             description={single.description}
