@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import blankimg from './../blank.jpg';
 
-export default class Newsitem extends Component {
+ const Newsitem = (props) => {
 
 
-    render() {
+    
 
-        const { title, description, img, url, author, publishedAt } = this.props;
+        const { title, description, img, url, author, publishedAt } = props;
 
         return (
             <>
@@ -29,4 +29,6 @@ export default class Newsitem extends Component {
             </>
         )
     }
-}
+
+
+export default Newsitem;

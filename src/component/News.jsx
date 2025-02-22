@@ -1,86 +1,94 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from './Header'
 import Newsitem from './Newsitem'
 import Loding from './Loding';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 
-export default class News extends Component {
-    constructor(){
-        super();
-        this.state={ 
-            totalResults:0,
-            allArtical:[],
-            pageNo:1,
-            pageSize:5,
-            loding:false
-        }
-    }
 
-    fetchMoreNews= async (no) => {
-        let url= `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.REACT_APP_API_KEY}&category=${this.props.category}&pagesize=${this.state.pageSize}&page=${ this.state.pageNo}`;
-        let data= await fetch (url);
-        let pareseData= await data.json();
+const News = (props) => {
+
+    const [totalResults, setTotalResults] = useState(0);
+    const [allArtical, setAllArtical] = useState([]);
+    const [pageNo, setPageNo] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [loding, setLoding] = useState(false);
+
+    const firstNews = async () => {
+
+
+        setLoding({ loding: true });
+
+        props.chengeProgress(30);
+
+        let url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.REACT_APP_API_KEY}&category=${props.category}&pagesize=${pageSize}&page=1`;
+        let data = await fetch(url);
+
+        props.chengeProgress(50);
+
+        let pareseData = await data.json();
+
+        props.chengeProgress(70);
         // console.log(pareseData);
-        
-        this.setState({
-            totalResults:pareseData.totalResults,
-            allArtical:pareseData.articles,
-            loding:false
-        });
+
+
+        setTotalResults(pareseData.totalResults);
+        setAllArtical(pareseData.articles);
+        setLoding(false);
+
+
+        props.chengeProgress(100);
     }
 
-    async componentDidMount(){
-        this.setState({loding:true});
-        this.fetchMoreNews(1);
+
+    useEffect(() => {
+        firstNews();
+    }, []);
+
+    const fetchMoreData = async () => {
+
+        let url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.REACT_APP_API_KEY}&category=${props.category}&pagesize=${pageSize}&page=${pageNo + 1}`;
+        let data = await fetch(url);
+        let pareseData = await data.json();
+        // console.log(pareseData);
+
+        setTotalResults(pareseData.totalResults);
+        setAllArtical(allArtical.concat(pareseData.articles));
+        setPageNo(pageNo + 1);
+        setLoding(false);
     }
 
-    handleNextClick = async () => {
-        this.setState({loding:true});
-        this.fetchMoreNews(this.state.pageNo+1);
 
-        this.setState({
-            pageNo: this.state.pageNo+1
-        });
-    }
-
-    handleprevClick = async () => {
-        this.setState({loding:true});
-        this.fetchMoreNews(this.state.pageNo-1);
-
-        this.setState({
-            pageNo:this.state.pageNo-1
-        });
-    }
     
-    render() {
         return (
             <>
-                <Header  title={this.props.category} desc="Thies is desc"/>
+                <Header title={props.category} desc="Thies is desc" />
 
-                <div className="container my-5">
 
-                    { this.state.loding &&<Loding/>}
 
-                    <div className="row">
-                        {!this.state.loding && this.state.allArtical.map((single)=>{
-                            return<Newsitem key={single.url}
-                            title={single. title}
-                            description={single.description}
-                            img={single.urlToImage  }
-                            url={single.url}
-                            author={single.author}
-                            publishedAt={single.publishedAt}/>  
-                        })}
-
+                {/* {this.state.loding && <Loding />} */}
+                <InfiniteScroll
+                    dataLength={allArtical.length}
+                    next={fetchMoreData}
+                    hasMore={allArtical.length <= totalResults}
+                    loader={loding && <Loding />}
+                >
+                    <div className="container my-5">
                         <div className="row">
-                            <div className="col">
-                                <button disabled={this.state.pageNo===1} className="btn btn-primary float-start" onClick={this.handleprevClick}>Previous</button>
-                                <button disabled={this.state.pageNo > (this.state.totalResults / this.state.pageSize)} className="btn btn-primary float-end"onClick={this.handleNextClick}>Next</button>
-                            </div>
-                        </div>
+                            {allArtical.map((single) => {
+                                return <Newsitem key={single.url}
+                                    title={single.title}
+                                    description={single.description}
+                                    img={single.urlToImage}
+                                    url={single.url}
+                                    author={single.author}
+                                    publishedAt={single.publishedAt} />
+                            })}
+                        </div >
                     </div>
-                </div>
+                </InfiniteScroll>
             </>
         )
     }
-}
+
+export default News;

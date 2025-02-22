@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React  from 'react'
 
-export default class Header extends Component {
-  render() {
-    const { title,desc} = this.props;
+const Header = (props) => {
+  
+    const { title,desc} = props;
     return (
       <>
       <div className="header">
@@ -12,4 +12,6 @@ export default class Header extends Component {
       </>
     )
   }
-}
+
+
+export default Header;
